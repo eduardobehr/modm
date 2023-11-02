@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-h7a3ziq</extends>
+  <options>
+    <option name="modm:build:build.path">../../../build/nucleo_h7a3ziq/blink</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+<!-- 	  <module>modm:build:cmake</module> -->
+  </modules>
+</library>
