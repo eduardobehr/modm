@@ -32,8 +32,8 @@ main()
 	while (true)
 	{
 		Leds::write(1 << (counter % (Leds::width+1) ));
-		modm::delay(Button::read() ? 10ms : 100ms);
-// 		modm::delay(100ms);
+		modm::delay(Button::read() ? 500ms : 1000ms);
+
 
 		MODM_LOG_INFO << "loop: " << counter++ << modm::endl;
 	}

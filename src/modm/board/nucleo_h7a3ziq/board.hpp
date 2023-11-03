@@ -28,26 +28,26 @@ namespace Board
 /// @{
 using namespace modm::literals;
 
-/// STM32H723ZG running at 500MHz from PLL clock generated from 8 MHz HSE
+/// STM32H7A3ZIQ running at 280MHz from PLL clock generated from 8 MHz HSE
 struct SystemClock
 {
-	// Max 550MHz
+	// Max 280 MHz
 	static constexpr uint32_t SysClk = 280_MHz;
-	static constexpr uint32_t Pll1Q = SysClk / 4;
-	// Max 550MHz
+	static constexpr uint32_t Pll1Q = SysClk / 1;
 	static constexpr uint32_t Hclk = SysClk / 1; // D1CPRE
 	static constexpr uint32_t Frequency = Hclk;
-	// Max 275MHz
-	static constexpr uint32_t Ahb = Hclk / 2; // HPRE
+
+	static constexpr uint32_t Ahb = Hclk / 1; // HPRE
 	static constexpr uint32_t Ahb1 = Ahb;
 	static constexpr uint32_t Ahb2 = Ahb;
 	static constexpr uint32_t Ahb3 = Ahb;
 	static constexpr uint32_t Ahb4 = Ahb;
-	// Max 137.5MHz
-	static constexpr uint32_t Apb1 = Ahb / 2; // D2PPRE1
-	static constexpr uint32_t Apb2 = Ahb / 2; // D2PPRE2
-	static constexpr uint32_t Apb3 = Ahb / 2; // D1PPRE
-	static constexpr uint32_t Apb4 = Ahb / 2; // D3PPRE
+	static constexpr uint32_t Apb1 = Ahb / 2; // CDPPRE1
+	static constexpr uint32_t Apb2 = Ahb / 2; // CDPPRE2
+
+	// Max 140 MHz
+	static constexpr uint32_t Apb3 = Ahb / 2; // CDPPRE
+	static constexpr uint32_t Apb4 = Ahb / 2; // SRDPPRE
 
 	static constexpr uint32_t Adc1 = Ahb1;
 	static constexpr uint32_t Adc2 = Ahb1;
@@ -64,7 +64,7 @@ struct SystemClock
 
 	static constexpr uint32_t Usart1  = Apb2;
 	static constexpr uint32_t Usart2  = Apb1;
-	static constexpr uint32_t Usart3  = Apb1;
+	static constexpr uint32_t Usart3  = Apb1/2; // FIXME: workaround to make baudrate match
 	static constexpr uint32_t Uart4   = Apb1;
 	static constexpr uint32_t Uart5   = Apb1;
 	static constexpr uint32_t Usart6  = Apb2;
@@ -109,33 +109,33 @@ struct SystemClock
 	enable()
 	{
 		// Switch core supply voltage to maximum level
-		// Required for running at 550 MHz
+		// Required for running at 280 MHz
 		Rcc::setVoltageScaling(Rcc::VoltageScaling::Scale0);
 
 		Rcc::enableExternalClock(); // 8 MHz
 		const Rcc::PllFactors pllFactors1{
 			.range = Rcc::PllInputRange::MHz1_2,
 			.pllM  = 4,		//   8 MHz / 4   =   2 MHz
-			.pllN  = 275,	//   2 MHz * 275 = 550 MHz
-			.pllP  = 1,		// 550 MHz / 1   = 550 MHz
-			.pllQ  = 4,		// 550 MHz / 4   = 137.5 MHz
-			.pllR  = 2,		// 550 MHz / 2   = 275 MHz
+			.pllN  = 280,	//   2 MHz * 280 = 560 MHz
+			.pllP  = 2,		// 560 MHz / 2   = 280 MHz
+			.pllQ  = 2,		// 560 MHz / 2   = 280 MHz
+			.pllR  = 2,		// 560 MHz / 2   = 275 MHz
 		};
 		Rcc::enablePll1(Rcc::PllSource::Hse, pllFactors1);
 		Rcc::setFlashLatency<Ahb>();
 
-		// max. 275MHz
+		// max. 280MHz
 		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div2);
-		// max. 137.5MHz on Apb clocks
-		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div1);
-		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div1);
-		Rcc::setApb3Prescaler(Rcc::Apb3Prescaler::Div1);
-		Rcc::setApb4Prescaler(Rcc::Apb4Prescaler::Div1);
+		// max. 140MHz on Apb clocks
+		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
+		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
+		Rcc::setApb3Prescaler(Rcc::Apb3Prescaler::Div2);
+		Rcc::setApb4Prescaler(Rcc::Apb4Prescaler::Div2);
 
 		// update clock frequencies
 		Rcc::updateCoreFrequency<Frequency>();
 		// switch system clock to pll
-		Rcc::enableSystemClock(Rcc::SystemClockSource::Hsi);
+		Rcc::enableSystemClock(Rcc::SystemClockSource::Pll1P);
 
 		return true;
 	}
