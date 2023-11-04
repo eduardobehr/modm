@@ -64,7 +64,7 @@ struct SystemClock
 
 	static constexpr uint32_t Usart1  = Apb2;
 	static constexpr uint32_t Usart2  = Apb1;
-	static constexpr uint32_t Usart3  = Apb1/2; // FIXME: workaround to make baudrate match
+	static constexpr uint32_t Usart3  = Apb1;
 	static constexpr uint32_t Uart4   = Apb1;
 	static constexpr uint32_t Uart5   = Apb1;
 	static constexpr uint32_t Usart6  = Apb2;
@@ -115,17 +115,17 @@ struct SystemClock
 		Rcc::enableExternalClock(); // 8 MHz
 		const Rcc::PllFactors pllFactors1{
 			.range = Rcc::PllInputRange::MHz1_2,
-			.pllM  = 4,		//   8 MHz / 4   =   2 MHz
-			.pllN  = 280,	//   2 MHz * 280 = 560 MHz
+			.pllM  = 4,		//   64 MHz / 4   =   16 MHz
+			.pllN  = 35,	//   16 MHz * 35 = 560 MHz
 			.pllP  = 2,		// 560 MHz / 2   = 280 MHz
 			.pllQ  = 2,		// 560 MHz / 2   = 280 MHz
 			.pllR  = 2,		// 560 MHz / 2   = 275 MHz
 		};
-		Rcc::enablePll1(Rcc::PllSource::Hse, pllFactors1);
+		Rcc::enablePll1(Rcc::PllSource::Hsi, pllFactors1);
 		Rcc::setFlashLatency<Ahb>();
 
 		// max. 280MHz
-		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div2);
+		Rcc::setAhbPrescaler(Rcc::AhbPrescaler::Div1);
 		// max. 140MHz on Apb clocks
 		Rcc::setApb1Prescaler(Rcc::Apb1Prescaler::Div2);
 		Rcc::setApb2Prescaler(Rcc::Apb2Prescaler::Div2);
