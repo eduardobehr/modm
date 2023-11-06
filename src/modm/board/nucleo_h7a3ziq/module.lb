@@ -29,7 +29,13 @@ def prepare(module, options):
         ":platform:core",
         ":platform:gpio",
         ":platform:clock",
-        ":platform:uart:3")
+        ":platform:uart:3",
+        ":platform:timer:1",
+        ":platform:timer:2",
+        ":platform:timer:3",
+        ":platform:timer:4",
+        ":platform:timer:5",
+    )
 
     return True
 
