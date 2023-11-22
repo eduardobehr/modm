@@ -157,7 +157,7 @@ namespace stlink
 {
 /// @ingroup modm_board_nucleo_h723zg
 /// @{
-using Tx = GpioOutputD8;
+using Tx = GpioB10;
 using Rx = GpioInputD9;
 using Uart = Usart3;
 /// @}
