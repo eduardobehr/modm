@@ -35,7 +35,11 @@ def prepare(module, options):
         ":platform:timer:3",
         ":platform:timer:4",
         ":platform:timer:5",
-        ":platform:adc:1"
+        ":platform:timer:12",
+        ":platform:timer:13",
+        ":platform:adc:1",
+        ":platform:adc:2",
+        ":platform:dma"
     )
 
     return True
