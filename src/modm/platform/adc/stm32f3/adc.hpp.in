@@ -471,12 +471,24 @@ public:
 	 * @param sampleTime 
 	 * @return true on success
 	 * @return false if the sequence is full
+	 * @warning the first channel must be added by itself with `setChannel()`
 	 */
 	static bool
 	addChannelToSequence(const Channel channel,
 										const SampleTime sampleTime){
 		// read channel count
 		uint8_t channel_count = (ADC{{ id }}->SQR1 & ADC_SQR1_L) >> ADC_SQR1_L_Pos;
+
+		/**
+		 * @note From the STM32H7xx datasheet:
+		 * Bits 3:0 L[3:0]: Regular channel sequence length (ADCx_SQR1)
+		 *	0000: 1 conversion
+		 *	0001: 2 conversions
+		 *	...
+		 *	1111: 16 conversions
+		 * 
+		 */
+
 		++channel_count;
 		if(channel_count > 16){
 			return false;
@@ -484,18 +496,18 @@ public:
 
 		constexpr uint8_t cChannelMask = 0b11111;
 		// write channel number
-		if(channel_count < 5) {
+		if(channel_count < 4) {
 			ADC{{ id }}->SQR1 |=
-				(uint32_t(channel) & cChannelMask) << (channel_count*6);
-		} else 	if(channel_count < 10) {
+				(uint32_t(channel) & cChannelMask) << ((channel_count+1)*6);
+		} else 	if(channel_count < 9) {
 			ADC{{ id }}->SQR2 |=
-				(uint32_t(channel) & cChannelMask) << ((channel_count-5)*6);
-		} else 	if(channel_count < 15) {
+				(uint32_t(channel) & cChannelMask) << ((channel_count-4)*6);
+		} else 	if(channel_count < 14) {
 			ADC{{ id }}->SQR3 |=
-				(uint32_t(channel) & cChannelMask) << ((channel_count-10)*6);
+				(uint32_t(channel) & cChannelMask) << ((channel_count-9)*6);
 		} else {
 			ADC{{ id }}->SQR4 |=
-				(uint32_t(channel) & cChannelMask) << ((channel_count-15)*6);
+				(uint32_t(channel) & cChannelMask) << ((channel_count-14)*6);
 		}
 
 		ADC{{ id }}->PCSEL |= 1U << static_cast<uint8_t>(channel);
@@ -506,6 +518,31 @@ public:
 		setSampleTime(channel, sampleTime);
 
 		return true;
+	}
+
+	/**
+	 * @brief Configures the channels sequence as defined by the provided array of channels
+	 * 
+	 * @param channel pointer to first element of channels array
+	 * @param length number of elements in array
+	 * @param sampleTime sample time to be used on all channels in the sequence
+	 */
+	static void
+	configureRegularSequence(const Channel channel[], size_t length, SampleTime sampleTime){
+		// reset sequence and conversion registers
+		ADC{{ id }}->PCSEL = 0;
+		ADC{{ id }}->SQR1 = 0;
+		ADC{{ id }}->SQR2 = 0;
+		ADC{{ id }}->SQR3 = 0;
+		ADC{{ id }}->SQR4 = 0;
+		for(size_t i=0; i < length; i++){
+			// first channel is set by itself, because length bits in ADCx_SQR1 default to 0000 (1 channel)
+			if(0 == i){
+				setChannel(channel[i], sampleTime);
+			} else {
+				addChannelToSequence(channel[i], sampleTime);
+			}
+		}
 	}
 
 	static void
