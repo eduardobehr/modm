@@ -12,6 +12,7 @@
 // ----------------------------------------------------------------------------
 
 #pragma once
+#define BOARD_NUCLEO_H7A3ZI_Q
 
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
@@ -19,12 +20,12 @@
 
 using namespace modm::platform;
 
-/// @ingroup modm_board_nucleo_h723zg
+/// @ingroup modm_board_nucleo_h7a3ziq
 #define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
-/// @ingroup modm_board_nucleo_h723zg
+/// @ingroup modm_board_nucleo_h7a3ziq
 /// @{
 using namespace modm::literals;
 
@@ -155,7 +156,7 @@ using Leds = SoftwareGpioPort< LedRed, LedYellow, LedGreen >;
 
 namespace stlink
 {
-/// @ingroup modm_board_nucleo_h723zg
+/// @ingroup modm_board_nucleo_h7a3ziq
 /// @{
 using Tx = GpioB10;
 using Rx = GpioInputD9;
@@ -163,7 +164,7 @@ using Uart = Usart3;
 /// @}
 }
 
-/// @ingroup modm_board_nucleo_h723zg
+/// @ingroup modm_board_nucleo_h7a3ziq
 /// @{
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
 
