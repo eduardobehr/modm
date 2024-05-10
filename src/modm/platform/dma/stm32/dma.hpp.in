@@ -73,7 +73,7 @@ public:
 %% endif
 		}
 %% endif
-%% if dmaType in ["stm32-mux"]:
+%% if dmaType in ["stm32-mux"] and target.family != "g0":
 		Rcc::enable<Peripheral::Dmamux1>();
 %% endif
 	}
@@ -295,7 +295,7 @@ public:
 %% endif
 			})->muxChannel;
 			auto* channel = DMAMUX1_Channel0 + muxChannel;
-			channel->CCR = (channel->CCR & DMAMUX_CxCR_DMAREQ_ID) | uint32_t(dmaRequest);
+			channel->CCR = (channel->CCR & ~DMAMUX_CxCR_DMAREQ_ID) | uint32_t(dmaRequest);
 %% elif dmaType in ["stm32-stream-channel"]
 			DMA_Channel_TypeDef *Channel = reinterpret_cast<DMA_Channel_TypeDef*>(CHANNEL_BASE);
 			Channel->CR = (Channel->CR & ~DMA_SxCR_CHSEL_Msk) | uint32_t(dmaRequest);
@@ -384,7 +384,7 @@ public:
 		static void
 		clearInterruptFlags(InterruptFlags_t flags = InterruptFlags::All)
 		{
-			ControlHal::clearInterruptFlags(flags, ChannelID);
+			ControlHal::clearInterruptFlags(InterruptFlags(flags.value), ChannelID);
 		}
 
 		/**

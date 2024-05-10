@@ -3,6 +3,7 @@
  * Copyright (c) 2014, Sascha Schade
  * Copyright (c) 2014, 2016-2017, Niklas Hauser
  * Copyright (c) 2023, Christopher Durand
+ * Copyright (c) 2024, Eduardo Behr
  *
  * This file is part of the modm project.
  *
@@ -195,14 +196,14 @@ modm::platform::Adc{{ id }}::configureChannel(Channel channel,
 	uint32_t tmpreg = 0;
 	if (static_cast<uint8_t>(channel) < 10) {
 		tmpreg = ADC{{ id }}->SMPR1
-			& ((~ADC_SMPR1_SMP0) << (static_cast<uint8_t>(channel) * 3));
+			& ~((ADC_SMPR1_SMP0) << (static_cast<uint8_t>(channel) * 3));
 		tmpreg |= static_cast<uint32_t>(sampleTime) <<
 						(static_cast<uint8_t>(channel) * 3);
 		ADC{{ id }}->SMPR1 = tmpreg;
 	}
 	else {
 		tmpreg = ADC{{ id }}->SMPR2
-			& ((~ADC_SMPR2_SMP10) << ((static_cast<uint8_t>(channel)-10) * 3));
+			& ~((ADC_SMPR2_SMP10) << ((static_cast<uint8_t>(channel)-10) * 3));
 		tmpreg |= static_cast<uint32_t>(sampleTime) <<
 						((static_cast<uint8_t>(channel)-10) * 3);
 		ADC{{ id }}->SMPR2 = tmpreg;
@@ -232,6 +233,18 @@ modm::platform::Adc{{ id }}::setFreeRunningMode(const bool enable)
 	} else {
 		ADC{{ id }}->CFGR &= ~ADC_CFGR_CONT; // set to single mode
 	}
+}
+
+void
+modm::platform::Adc{{ id }}::setOverRunMode(bool enable)
+{
+%% if target["family"] in ["f3", "g4", "gb", "l4", "l5", "h5", "h7"]
+	if (enable) {
+		ADC{{ id }}->CFGR |=  ADC_CFGR_OVRMOD; // perform conversion even if value was not retrived yet (data is lost)
+	} else {
+		ADC{{ id }}->CFGR &= ~ADC_CFGR_OVRMOD; // reject conversion if value has not been retrieved
+	}
+%% endif
 }
 
 void

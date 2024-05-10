@@ -231,6 +231,18 @@ public:
 		return true;
 	}
 
+	static inline bool
+	isCountingUp()
+	{
+		return (TIM{{ id }}->CR1 & TIM_CR1_DIR) == 0;
+	}
+
+	static inline bool
+	isCountingDown()
+	{
+		return !isCountingUp();
+	}
+
 	static inline void
 	enableOutput()
 	{
@@ -241,6 +253,12 @@ public:
 	disableOutput()
 	{
 		TIM{{ id }}->BDTR &= ~(TIM_BDTR_MOE);
+	}
+
+	static inline bool
+	isOutputEnabled()
+	{
+		return (TIM{{ id }}->BDTR & TIM_BDTR_MOE);
 	}
 
 	/*
