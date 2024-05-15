@@ -158,7 +158,8 @@ namespace stlink
 {
 /// @ingroup modm_board_nucleo_h7a3ziq
 /// @{
-using Tx = GpioB10;
+using Tx = GpioD8;	// NUCLEO built-in UART
+// using Tx = GpioB10; // External serial logger
 using Rx = GpioInputD9;
 using Uart = Usart3;
 /// @}
