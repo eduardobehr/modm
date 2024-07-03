@@ -21,7 +21,7 @@
 using namespace modm::platform;
 
 /// @ingroup modm_board_nucleo_h7a3ziq
-#define MODM_BOARD_HAS_LOGGER
+// #define MODM_BOARD_HAS_LOGGER
 
 namespace Board
 {
@@ -167,7 +167,9 @@ using Uart = Usart3;
 
 /// @ingroup modm_board_nucleo_h7a3ziq
 /// @{
+#ifdef MODM_BOARD_HAS_LOGGER
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+#endif
 
 inline void
 initialize()
@@ -175,8 +177,10 @@ initialize()
     SystemClock::enable();
     SysTickTimer::initialize<SystemClock>();
 
+	#ifdef MODM_BOARD_HAS_LOGGER
     stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
     stlink::Uart::initialize<SystemClock, 115200_Bd>();
+	#endif
 
     LedGreen::setOutput(modm::Gpio::Low);
     LedYellow::setOutput(modm::Gpio::Low);
